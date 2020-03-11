@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="4b9e12e8-7109-4b61-a97d-4e8aeb6c690b" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="mule-training-1Flow" doc:id="01d453c7-bf07-4224-a047-6d7e63ab584f" >
+		<http:listener doc:name="Listener" doc:id="09f067e6-c914-4f04-a851-f386c0c6e8fc" config-ref="HTTP_Listener_config" path="/training"/>
+		<logger level="INFO" doc:name="Logger" doc:id="d0575b53-dd58-473a-a26a-f38c01bc50e6" message="mule-traing flow initiated messge : #[message] "/>
+		<set-variable value='#["FirstDemoVar"]' doc:name="Set Variable" doc:id="9c3cf112-c4ca-4758-a80a-bd610782524d" variableName="demvar"/>
+		<ee:transform doc:name="Transform Message" doc:id="1e6dc8bb-b5be-44e0-b335-a27ae7630517" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": " First Mule App",
+	"payload" : payload,
+	"dbuser": p('secure::db.password')
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="fb528f99-ec69-4a24-a40a-653f93ca7abb" message="ouput : #[payload] Vars: #[vars.demvar] "/>
+	</flow>
+</mule>

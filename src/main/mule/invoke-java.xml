@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:java="http://www.mulesoft.org/schema/mule/java"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+	<flow name="invoke-javaFlow" doc:id="7e9fdee7-2e1a-4f50-a673-9337f0a8b4a5" >
+		<logger level="INFO" doc:name="Logger" doc:id="91096341-bcbd-48cf-a2b8-15f4d612ac03" />
+		<java:new doc:name="New" doc:id="e13f4733-6ad3-4dd3-b675-1cdbd6945423" class="com.muletraining.TaxCalculator" constructor="TaxCalculator()" target="calc"/>
+		<java:invoke doc:name="Invoke" doc:id="7c1b4093-e79f-4ab4-bb6e-f7f19d1b82f7" instance="#[vars.calc]" class="com.muletraining.TaxCalculator" method="calculateTax(Double, Integer)">
+			<java:args ><![CDATA[#[{
+        price: 25.5,
+        percentAdditionalTax: 2
+      }]]]></java:args>
+		</java:invoke>
+		<logger level="INFO" doc:name="Logger" doc:id="52c8cab4-4950-4536-bcb8-9ca0f6e1ce09" message="out:  #[payload]"/>
+	</flow>
+	<flow name="invoke-javaFlow1" doc:id="77b6c2cb-4c94-4401-96d7-83550de3851a" >
+		<scheduler doc:name="Scheduler" doc:id="8d40f403-ad8e-4e9a-b395-d9ca31b81594">
+			<scheduling-strategy>
+				<fixed-frequency frequency="10000" />
+			</scheduling-strategy>
+		</scheduler>
+		<java:invoke-static doc:name="Invoke static" doc:id="19243017-602a-4d6c-a0c9-dd30825bd9f8" class="com.muletraining.StaticTest" method="myfun(java.lang.String)">
+			<java:args ><![CDATA[#[{
+	arg0 : "Hey Mule Soft"
+}]]]></java:args>
+		</java:invoke-static>
+		<logger level="INFO" doc:name="Logger" doc:id="870505cb-9f58-4006-9a99-674242ef71fc" message="ooo:  #[payload]"/>
+	</flow>
+</mule>

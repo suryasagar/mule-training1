@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="dw-test1Flow" doc:id="58112d70-63a0-4450-af35-b2a30259ed51" >
+		<http:listener doc:name="Listener" doc:id="65b38775-86a9-4146-940f-967a395ab3f6" config-ref="HTTP_Listener_config" path="/dw"/>
+		<set-payload value='#[%dw 2.0
+output application/json
+---
+
+ user:  {
+    firstName: "Mule",
+    lastName: "TEST",
+    "add": {
+    	add1: "aa",
+    	
+    }
+  }]' doc:name="Set Payload" doc:id="1c008499-434c-4b7a-9b6f-52c88fe401cb" />
+		<ee:transform doc:name="Transform Message" doc:id="0f2d828f-5284-46a6-a8b9-1e58c3965683" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+ns ns0 http://www.abc.com
+ns ns1 http://www.123.com
+
+output application/xml
+---
+
+ ns0#user:  {
+    ns0#firstName: upper(payload.user.firstName),
+    ns0#lastName: lower(payload.user.lastName),
+    ns0#Name: payload.user.firstName as String ++ 2 as Number ++ payload.user.lastName,
+   	ns0#id: (1 ++ 2 ) as Number,
+    ns1#"add": payload.user.add
+  }
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="ed8adfba-8895-4587-a14b-6d4bc4b2e00b" message="dw out : #[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="3fe411f1-e738-4e3c-84f5-8f5a375d394e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+
+ns ns0 http://www.abc.com
+ns ns1 http://www.123.com
+output application/json
+---
+{
+	fname: payload.ns0#user.ns0#'firstName',
+	lname: payload.ns0#user.ns0#'lastName',
+	add1: payload.ns0#user.ns1#add.'add1',
+	eid: uuid()
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="72cd7554-c868-4b54-b5fa-1c65a76f25c7" message="#[payload]"/>
+	</flow>
+</mule>

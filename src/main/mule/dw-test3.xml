@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="dw-test3Flow" doc:id="03fd3078-3307-466a-b60e-03c64cb72f68" >
+		<http:listener doc:name="Listener" doc:id="ca03df21-60ea-41c9-9bc8-393dd6da5250" config-ref="HTTP_Listener_config" path="/dw1" allowedMethods="GET" />
+		<ee:transform doc:name="Transform Message" doc:id="3f510be1-2ebf-4823-bdb1-a0b8fa5aa327" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import dwglobal::externalFunctions
+import dwglobal::customHeader
+output application/json
+---
+{
+	"user" : externalFunctions::main(payload: { "user" : "bar" }),
+	"myfun" : customHeader::myFunc("Dataweave"),
+	"flow-out": lookup("dw-test3Flow1","From DW")
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="9ab85a33-8b6f-4a13-8f20-cdc0a503a8c1" message="out: #[payload]"/>
+	</flow>
+	<flow name="dw-test3Flow1" doc:id="86c82ac0-e27c-4576-8030-eabe2eb29915" >
+		<set-payload value='[{"eid" : 555, "ename" : "sahd"},{"eid" : 556, "ename" : "KKKK"}]' doc:name="Set Payload" doc:id="91f58c24-e7af-4bda-bb47-d9346a820ecc" mimeType="application/json"/>
+		<ee:transform doc:name="Transform Message" doc:id="3bec847d-1a51-46d2-8301-636f1c46b6b8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var mystr = "You can define your own DataWeave functions "
+var price = 30
+var user = [
+	{"id": 101, "name" : "PLV"},
+	{"id": 102, "name" : "Test"}
+]
+var empPayload = payload filter ($.eid == 556)
+fun subString(str: String, lenth : Number) = 
+if(!isEmpty(str) and sizeOf(str) > lenth) str [0 to lenth] else str
+
+fun subStringF(str: String, lenth : Number , indStr: String) = 
+if(!isEmpty(str) and sizeOf(str) > lenth) str [sizeOf(indStr) to lenth] else str
+---
+[
+"desc" : subString(mystr, 30),
+"desc1" : subStringF(mystr, 25,"You"),
+  { "dateTime" : now() },
+  { "era-G" : now() as String { format: "G"} },
+  { "year-u" : now() as String {format: "u"} },
+  {"date" : now() as Number	},
+  { "year" : now().timezone},
+  {"diff" :  ((now() + |PT1H|) as Number )- now() as Number},
+  {"1M" : now() + |P1Y|}
+  
+ ]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="66af74b5-c71b-4936-844a-aec6735f8882" message="out:  #[payload]"/>
+	</flow>
+</mule>
