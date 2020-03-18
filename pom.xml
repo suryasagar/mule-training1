@@ -15,6 +15,13 @@
 
 		<app.runtime>4.2.1</app.runtime>
 		<mule.maven.plugin.version>3.2.7</mule.maven.plugin.version>
+		<username>msagarkumarreddy</username>
+		<password>Surya123@</password>
+		<workers>1</workers>
+		<worker.type>MICRO</worker.type>
+		<environment>Sandbox</environment>
+		<mule.version>4.2.1</mule.version>
+		<application.name>demo-muletraining-api</application.name>
 	</properties>
 
 	<build>
@@ -25,6 +32,16 @@
 				<version>${mule.maven.plugin.version}</version>
 				<extensions>true</extensions>
 				<configuration>
+					<cloudHubDeployment>
+						<uri>https://anypoint.mulesoft.com</uri>
+						<username>${username}</username>
+						<password>${password}</password>         
+						<workers>${workers}</workers>
+						<workerType>${worker.type}</workerType>
+						<environment>${environment}</environment>
+						<muleVersion>${mule.version}</muleVersion>
+						<applicationName>${application.name}</applicationName>
+					</cloudHubDeployment>
 				</configuration>
 			</plugin>
 		<plugin>
@@ -99,6 +116,7 @@
                 <enabled>false</enabled>
             </snapshots>
         </pluginRepository>
+       
     </pluginRepositories>
 
 </project>
